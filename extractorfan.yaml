@@ -1,0 +1,69 @@
+esphome:
+  name: extractorfan
+  friendly_name: extractorfan
+
+esp32:
+  variant: esp32
+  framework:
+    type: esp-idf
+    
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Extractor fan Fallback Hotspot"
+    password: ""
+
+captive_portal:
+
+web_server:
+  port: 80
+
+remote_transmitter:
+  pin: 12  
+  carrier_duty_percent: 50%
+
+button:
+  - platform: template
+    name: "Toggle power"
+    on_press:
+      - remote_transmitter.transmit_pronto:
+          data: "0000 006D 0009 0000 001D 001A 001D 0035 0039 001A 001D 001A 001D 0035 0039 0050 001D 0035 001D 001A 003A 0180"
+  - platform: template
+    name: "Toggle light"
+    on_press:
+      - remote_transmitter.transmit_pronto:
+          data: "0000 006D 0009 0000 001D 001A 001D 001A 0039 0035 001D 001A 001D 001A 0039 006B 001D 001B 001C 001B 0055 0180"
+  - platform: template
+    name: "Increase speed"
+    on_press:
+      - remote_transmitter.transmit_pronto:
+          data: "0000 006D 0008 0000 001E 0019 0056 0019 001E 0019 001E 0019 0056 0019 001E 004F 0056 0034 003A 0180"
+  - platform: template
+    name: "Decrease speed"
+    on_press:
+      - remote_transmitter.transmit_pronto:
+          data: "0000 006D 0008 0000 001D 0035 0039 001A 001D 001A 001D 0035 0039 001A 001D 006B 0039 0035 0039 0180"
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO39
+      inverted: true  # Button is active low
+    name: "Atom Button"
+    on_press:
+      - remote_transmitter.transmit_pronto:
+          data: "0000 006D 0009 0000 001D 001A 001D 001A 0039 0035 001D 001A 001D 001A 0039 006B 001D 001B 001C 001B 0055 0180"
